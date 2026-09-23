@@ -3664,6 +3664,11 @@ SpellCastResult Spell::prepare(SpellCastTargets const* targets, AuraEffect const
     if (unitCaster && unitCaster->IsPlayer())
         if (unitCaster->ToPlayer()->GetCommandStatus(CHEAT_CASTTIME))
             m_casttime = 0;
+#ifdef USE_CUSTOM_CHANGES
+        // remove cast time for ghost wolf
+        else if (m_spellInfo->Id == 2645)
+            m_casttime = 0;
+#endif
 
     // don't allow channeled spells / spells with cast time to be casted while moving
     // (even if they are interrupted on moving, spells with almost immediate effect get to have their effect processed before movement interrupter kicks in)
@@ -6925,8 +6930,14 @@ SpellCastResult Spell::CheckCast(bool strict, uint32* /*param1*/, uint32* /*para
                     if (unitCaster && unitCaster->IsPlayer() && !allowMount && !m_spellInfo->AreaGroupId)
                         return SPELL_FAILED_NO_MOUNTS_ALLOWED;
 
+#ifdef USE_CUSTOM_CHANGES
+                    // this hinders mounting when morphed
+                    if (unitCaster && unitCaster->IsInDisallowedMountForm() && unitCaster->GetDisplayId() != 7550)
+                        return SPELL_FAILED_NOT_SHAPESHIFT;
+#else
                     if (unitCaster && unitCaster->IsInDisallowedMountForm())
                         return SPELL_FAILED_NOT_SHAPESHIFT;
+#endif
 
                     // xinef: dont allow to cast mounts in specific transforms
                     if (unitCaster && unitCaster->getTransForm())

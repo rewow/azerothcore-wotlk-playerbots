@@ -208,7 +208,7 @@ public:
 
     void WarnAboutSyncQueries([[maybe_unused]] bool warn)
     {
-#ifdef ACORE_DEBUG
+#if defined(ACORE_DEBUG) && !defined(USE_CUSTOM_CHANGES)
         _warnSyncQueries = warn;
 #endif
     }
